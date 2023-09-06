@@ -390,9 +390,17 @@ inline bool KSerializePrivate::deserializeProperties(const QMetaObject *metaObje
         reqProps.insert(property.name());
     }
 
-    auto vObj = value.toJsonObject();
+    auto jsValue = QJsonValue::fromVariant(value);
+    if(jsValue.isArray())
+    {
+        qCWarning(logDeSerialze) << __FUNCTION__ << "line:" <<__LINE__
+                                 << "value is json array." << jsValue.type();
+        return false;
+    }
+    auto jsArray = jsValue.toObject();
+
     auto index = 0;
-    for (auto it = vObj.constBegin(); it != vObj.constEnd(); it++)
+    for (auto it = jsArray.constBegin(); it != jsArray.constEnd(); it++)
     {
         if (it.key() == QStringLiteral("@class"))
         {
@@ -439,24 +447,24 @@ inline QVariant KSerializePrivate::serializeList(int propertyType, const QVarian
     }
 
     auto index = 0;
-    QVariantList array;
+    QJsonArray array;
+
     for (const auto &element : value.value<QSequentialIterable>())
     {
-        array << q->serializeSubtype(element.userType(), element,"[" + QByteArray::number(index++) + "]");
+        array.append(QJsonValue::fromVariant(q->serializeSubtype(element.userType(), element,"[" + QByteArray::number(index++) + "]")));
     }
     return array;
 }
 
 inline QVariant KSerializePrivate::deserializeList(int propertyType, const QVariant &value) const
 {
-
     qCDebug(logDeSerialze) << __FUNCTION__ << "line:" <<__LINE__
                          << "name:" << QMetaType::typeName(propertyType)
                          << "type:" << propertyType << " value->userType:" << value.userType()
                          << " value:" << value;
     QVariant list{};
 
-    const auto array = value.toJsonArray();
+    const auto array = QJsonValue::fromVariant(value).toArray();
     if(QMetaType::QStringList == propertyType)
     {
         return deserializeArray<QVariantList>(QMetaType::QString, array, nullptr);

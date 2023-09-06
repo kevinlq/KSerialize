@@ -44,7 +44,7 @@ public:
     T deserialize(const QJsonValue &json, QObject *parent = nullptr) const;
 
 private:
-    QJsonValue serializeVariant(int propertyType, const QVariant &v) const;
+    QVariant serializeVariant(int propertyType, const QVariant &v) const;
     QVariant deserializeVariant(int propertyType, const QVariant &value, QObject *parent, bool skipConversion = false) const;
 
 private:

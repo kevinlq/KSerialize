@@ -34,8 +34,8 @@ QVariant KSerialize::serializeSubtype(const QMetaProperty &property, const QVari
 QVariant KSerialize::serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const
 {
     qCDebug(logSerialize) << __FUNCTION__ << "line:" <<__LINE__
-                       << "serializing subtype property " << traceHint
-                       << " of type " << QMetaType::typeName(propertyType);
+                          << "serializing subtype property " << traceHint
+                          << " of type " << QMetaType::typeName(propertyType) << propertyType;
 
     return serializeVariant(propertyType, value);
 }
@@ -70,7 +70,7 @@ QVariant KSerialize::deserializeSubtype(int propertyType, const QJsonValue &valu
 
 QJsonValue KSerialize::serialize(const QVariant &v) const
 {
-    return serializeVariant(v.userType(), v);
+    return QJsonValue::fromVariant(serializeVariant(v.userType(), v));
 }
 
 QVariant KSerialize::deserialize(const QJsonValue &json, int metaTypeId, QObject *parent) const
@@ -78,7 +78,7 @@ QVariant KSerialize::deserialize(const QJsonValue &json, int metaTypeId, QObject
     return deserializeVariant(metaTypeId, json, parent);
 }
 
-QJsonValue KSerialize::serializeVariant(int propertyType, const QVariant &v) const
+QVariant KSerialize::serializeVariant(int propertyType, const QVariant &v) const
 {
     Q_D(const KSerialize);
     QVariant vValue;
@@ -111,7 +111,7 @@ QJsonValue KSerialize::serializeVariant(int propertyType, const QVariant &v) con
                            << "exception " << QString(e.what());
     }
 
-    return vValue.toJsonValue();
+    return vValue;
 }
 
 QVariant KSerialize::deserializeVariant(int propertyType, const QVariant &value, QObject *parent, bool skipConversion) const

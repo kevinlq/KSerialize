@@ -14,7 +14,7 @@ int main(/*int argc, char *argv[]*/)
 
     //QLoggingCategory::setFilterRules("kserial.serialize.debug=false");
     //QLoggingCategory::setFilterRules("kserial.deserialize.debug=true");
-    QLoggingCategory::setFilterRules("kserial.*.debug=true");
+    //QLoggingCategory::setFilterRules("kserial.*.debug=true");
 
     // From::function() const
     qRegisterMetaType<DScore>("DScore");
@@ -126,6 +126,11 @@ int main(/*int argc, char *argv[]*/)
     qDebug() << "score:" << JSON_PRINT(json.toObject());
 
     auto deserScore = serial.deserialize<sObj*>(json);
+    if(nullptr == deserScore)
+    {
+        qWarning() << "de serial fail.";
+        return 0;
+    }
     qDebug() << "testFloatList:" << deserScore->testFloatList;
 
 }
